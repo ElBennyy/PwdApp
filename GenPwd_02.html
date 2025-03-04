@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Contraseñas Seguras</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+    .container {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .password {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      padding: 10px;
+      background-color: #f2f2f2;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      word-wrap: break-word;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    .slider-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+    .slider-container input {
+      width: 80%;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .checkbox-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .checkbox-container input {
+      margin-right: 5px;
+    }
+    .copy-button {
+      margin-top: 15px;
+      padding: 8px 16px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .copy-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Generador de Contraseñas Seguras</h1>
+    
+    <div class="password" id="password">********</div>
+
+    <div class="controls">
+      <div class="slider-container">
+        <label for="length">Longitud de la contraseña: </label>
+        <input type="range" id="length" min="8" max="20" value="12">
+        <span id="length-value">12</span>
+      </div>
+
+      <div class="checkbox-container">
+        <label>
+          <input type="checkbox" id="include-lowercase" checked>
+          Letras minúsculas
+        </label>
+        <label>
+          <input type="checkbox" id="include-uppercase" checked>
+          Letras mayúsculas
+        </label>
+        <label>
+          <input type="checkbox" id="include-numbers" checked>
+          Números
+        </label>
+        <label>
+          <input type="checkbox" id="include-special" checked>
+          Caracteres especiales
+        </label>
+      </div>
+    </div>
+    
+    <button id="generate">Generar Contraseña</button>
+    <button class="copy-button" id="copy">Copiar Contraseña</button>
+  </div>
+
+  <script>
+    // Función para generar una contraseña segura
+    function generatePassword() {
+      const length = document.getElementById('length').value;
+      const useLowercase = document.getElementById('include-lowercase').checked;
+      const useUppercase = document.getElementById('include-uppercase').checked;
+      const useNumbers = document.getElementById('include-numbers').checked;
+      const useSpecial = document.getElementById('include-special').checked;
+
+      const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+      const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      const numberChars = '0123456789';
+      const specialChars = '!@#$%^&*()_+[]{}|;:,.<>?';
+      
+      let characters = '';
+      if (useLowercase) characters += lowercaseChars;
+      if (useUppercase) characters += uppercaseChars;
+      if (useNumbers) characters += numberChars;
+      if (useSpecial) characters += specialChars;
+
+      if (characters === '') {
+        alert("Selecciona al menos una opción para generar la contraseña.");
+        return;
+      }
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(crypto.getRandomValues(new Uint32Array(1))[0] / (0xFFFFFFFF + 1) * characters.length);
+        password += characters[randomIndex];
+      }
+
+      document.getElementById('password').textContent = password;
+    }
+
+    // Función para copiar la contraseña al portapapeles
+    function copyPassword() {
+      const passwordText = document.getElementById('password').textContent;
+      navigator.clipboard.writeText(passwordText)
+        .then(() => {
+          alert("Contraseña copiada al portapapeles!");
+        })
+        .catch(err => {
+          alert("Error al copiar la contraseña.");
+        });
+    }
+
+    // Configuración del evento para generar contraseña
+    document.getElementById('generate').addEventListener('click', generatePassword);
+
+    // Configuración del evento para copiar contraseña
+    document.getElementById('copy').addEventListener('click', copyPassword);
+
+    // Actualizar la longitud de la contraseña al mover el slider
+    document.getElementById('length').addEventListener('input', (e) => {
+      document.getElementById('length-value').textContent = e.target.value;
+    });
+
+    // Inicializar la contraseña al cargar la página
+    generatePassword();
+  </script>
+
+</body>
+</html>
